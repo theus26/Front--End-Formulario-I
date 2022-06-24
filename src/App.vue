@@ -3,7 +3,7 @@
     <NavBar/>
     <v-main>
       <router-view/>
-      <FooterVue/>
+     <FooterVue/>
     </v-main>
   </v-app>
 </template>
