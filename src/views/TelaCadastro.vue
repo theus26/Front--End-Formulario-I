@@ -13,8 +13,8 @@
         </v-text-field>
 
 
-
-        <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">
+       
+        <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate" id="btn">
           Cadastrar
         </v-btn>
 
@@ -31,6 +31,7 @@
 
 <script>
 import NavBarVue from '@/components/NavBar.vue'
+import { CriarUsuario } from "../Services/api"
 export default {
   name: "TelaCadastro",
   components: {
@@ -64,9 +65,14 @@ export default {
   }),
 
   methods: {
-    validate() {
-      this.$refs.form.validate()
-      // console.log(this.name);
+    async validate() {
+      if (this.$refs.form.validate()) {
+        const result = await CriarUsuario(this.name, this.email, this.senha);
+        if (result === 200) this.$router.push('/');
+        else this.error = true
+      }
+      else this.error = true;
+      console.log(this.name);
     },
     reset() {
       this.$refs.form.reset()

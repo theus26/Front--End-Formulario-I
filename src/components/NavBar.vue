@@ -1,8 +1,8 @@
 <template>
  <div id="nav">
       <router-link to="/" id="logo_url"> <img src="../assets/logo.png" :alt="alt" id="logo" /></router-link>
-      <router-link to="/about">Cadastro</router-link> |
-       <router-link to="/">Login</router-link>
+      <router-link  to="/about">Cadastro</router-link> |
+       <router-link  to="/">Login</router-link>
     </div>
   
 </template>
@@ -10,7 +10,9 @@
 <script>
 export default {
   name: 'NavBar',
-  
+  data: () => ({
+    teste:false
+  })
 }
 </script>
 
