@@ -1,5 +1,6 @@
 <template>
   <div class="txt">
+    <Message :msg="msg"  v-show="msg"/>
     <h1>Formulario de Cadastro</h1>
     <div class="container">
       <v-form ref="form" v-model="valid" lazy-validation>
@@ -13,14 +14,24 @@
         </v-text-field>
 
 
-       
-        <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate" id="btn">
+
+        <v-btn :disabled="!valid, dialog" color="success" class="mr-4" @click="validate" @submit="dialog" :loading="dialog"
+          id="btn">
           Cadastrar
         </v-btn>
+        <v-dialog v-model="dialog" hide-overlay persistent width="300">
+          <v-card color="primary" dark>
+            <v-card-text>
+             Cadastrando Usuario...
+              <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
 
         <v-btn color="error" class="mr-4" @click="reset">
           Limpar Formulario
         </v-btn>
+
       </v-form>
 
     </div>
@@ -31,14 +42,20 @@
 
 <script>
 import NavBarVue from '@/components/NavBar.vue'
+import Message from '../components/message.vue'
 import { CriarUsuario } from "../Services/api"
 export default {
   name: "TelaCadastro",
   components: {
-    NavBarVue
+    NavBarVue,
+    Message
+
   },
   data: () => ({
     valid: true,
+    dialog: false,
+    
+    msg: false,
     name: '',
     nameRules: [
       v => !!v || 'Insira Um nome ',
@@ -68,11 +85,18 @@ export default {
     async validate() {
       if (this.$refs.form.validate()) {
         const result = await CriarUsuario(this.name, this.email, this.senha);
-        if (result === 200) this.$router.push('/');
+        if (result === 200) {
+           this.msg=`Usuario ${this.name} Cadastrado !`
+         // const btn = document.getElementById("btn")
+          //btn.innerHTML="Cadastrando..."
+          setTimeout(() => (this.$router.push('/')),3000)
+
+          setTimeout(() => this.msg ="", 2000)
+        }
         else this.error = true
       }
       else this.error = true;
-      console.log(this.name);
+      //console.log(this.name);
     },
     reset() {
       this.$refs.form.reset()
@@ -80,6 +104,7 @@ export default {
     resetValidation() {
       this.$refs.form.resetValidation()
     },
+   
   },
 }
 </script>
