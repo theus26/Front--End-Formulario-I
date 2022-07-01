@@ -1,6 +1,12 @@
 <template>
   <div class="txt">
-    <Message :msg="msg"  v-show="msg"/>
+    <NavBar/>
+    <v-alert type="success" v-show="alertaSucess">
+      Usuario Cadastrado com Sucesso !
+    </v-alert>
+    <v-alert type="error" v-show="alertError" id="alerta">
+      Email Já Cadastrado !
+    </v-alert>
     <h1>Formulario de Cadastro</h1>
     <div class="container">
       <v-form ref="form" v-model="valid" lazy-validation>
@@ -8,25 +14,16 @@
 
         <v-text-field v-model="cpf" :rules="cpfRules" label="CPF" required v-mask="'###.###.###-##'"></v-text-field>
 
-        <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
+        <v-text-field v-model="email" :rules="[emailValido, emailRequired]" label="E-mail" required></v-text-field>
 
-        <v-text-field v-model="senha" :rules="senhaRules, emailRules" label="Senha" required type="password">
+        <v-text-field v-model="senha" :rules="[required, min, letraNum]" label="Senha" required type="password">
         </v-text-field>
 
-
-
-        <v-btn :disabled="!valid, dialog" color="success" class="mr-4" @click="validate" @submit="dialog" :loading="dialog"
-          id="btn">
+        <v-btn :disabled="!valid, dialog" color="success" class="mr-4" @click="validate" @submit="dialog"
+          :loading="dialog" id="btn">
           Cadastrar
         </v-btn>
-        <v-dialog v-model="dialog" hide-overlay persistent width="300">
-          <v-card color="primary" dark>
-            <v-card-text>
-             Cadastrando Usuario...
-              <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
-            </v-card-text>
-          </v-card>
-        </v-dialog>
+
 
         <v-btn color="error" class="mr-4" @click="reset">
           Limpar Formulario
@@ -36,25 +33,31 @@
 
     </div>
 
+  <FooterVue/>
   </div>
-
 </template>
 
 <script>
-import NavBarVue from '@/components/NavBar.vue'
-import Message from '../components/message.vue'
+
+import NavBar from '../components/NavBar.vue'
+import FooterVue from '../components/Footer.vue';
+
 import { CriarUsuario } from "../Services/api"
 export default {
   name: "TelaCadastro",
   components: {
-    NavBarVue,
-    Message
+    NavBar,
+    FooterVue
+
 
   },
   data: () => ({
     valid: true,
+    alertError: false,
+    alertaSucess: false,
     dialog: false,
-    
+    required: (value) => !!value || "Obrigatório.",
+    min: (v) => v.length >= 8 || "Min 8 caracteres.",
     msg: false,
     name: '',
     nameRules: [
@@ -62,21 +65,17 @@ export default {
       v => (v && v.length >= 5) || 'Nome Invalido, Insira no Minimo 5 Caracteres',
     ],
     email: '',
-    emailRules: [
-      v => !!v || 'Insira Um E-mail',
-      v => /.+@.+\..+/.test(v) || 'O e-mail deve ser válido',
-    ],
+    emailValido: (v) => /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || "O e-mail precisa ser válido.",
+    emailRequired: (v) => !!v || "E-mail é obrigatório",
     cpf: '',
     cpfRules: [
       v => !!v || 'Insira Um CPF ',
       v => (v && v.length >= 11) || 'CPF Invalido, Insira o CPF correto',
     ],
     senha: '',
-    senhaRules: [
-      v => !!v || 'Insira sua Senha ',
-      v => (v && v.length >= 5) || 'Numeros de Caracteres Invalidos, Insra Caracteres especiais',
-
-    ]
+    letraNum: (v) =>
+      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(v) ||
+      "Senha deve conter letra e número.",
 
 
   }),
@@ -86,25 +85,25 @@ export default {
       if (this.$refs.form.validate()) {
         const result = await CriarUsuario(this.name, this.email, this.senha);
         if (result === 200) {
-           this.msg=`Usuario ${this.name} Cadastrado !`
-         // const btn = document.getElementById("btn")
-          //btn.innerHTML="Cadastrando..."
-          setTimeout(() => (this.$router.push('/')),3000)
 
-          setTimeout(() => this.msg ="", 2000)
+          this.alertaSucess = true
+          setTimeout(() => (this.$router.push('/')), 3000)
+          // const btn = document.getElementById("btn")
+          //btn.innerHTML="Cadastrando..."
+
+
         }
-        else this.error = true
+        else this.alertError = true
       }
-      else this.error = true;
+      else this.alertError = true;
       //console.log(this.name);
     },
     reset() {
       this.$refs.form.reset()
+      this.alertError = false
     },
-    resetValidation() {
-      this.$refs.form.resetValidation()
-    },
-   
+
+
   },
 }
 </script>
@@ -115,11 +114,10 @@ export default {
 .container {
   display: flex;
   justify-content: center;
-  margin-top: 50px;
+  margin-top: 70px;
 }
 
 .txt {
-  padding-top: 10px;
   text-align: center;
   color: #FCBA03;
   font-weight: bold;

@@ -13,3 +13,12 @@ export const api = axios.create({
       console.error(e);
     });
   } 
+
+  export const LogarUsuario = async (email, senha) => {
+    return api.post('api/Login', {email, senha}).then(result => {
+        //console.log(name,email,senha)
+      return result.status;
+    }).catch(e => {
+      console.error(e);
+    });
+  } 
