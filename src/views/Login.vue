@@ -1,12 +1,14 @@
 <template>
   <div class="txt">
-     <NavBar/>
+    <NavBar />
+    <br> <br>
     <h1>Faça Seu Login </h1>
-     <v-alert type="error" v-show="alertError" >
-      Email ou Senha Incorretas !
+    <br><br>
+    <v-alert type="error" v-show="alertError" id="error">
+    Por Favor Preencha os Campos
     </v-alert>
-     <v-alert type="success" v-show="alertaSucess">
-     Carregando...
+      <v-alert type="error" v-show="alertError1" id="error">
+    Email ou Senha incorretas...
     </v-alert>
     <div class="container">
       <v-form ref="form" v-model="valid" lazy-validation>
@@ -25,7 +27,7 @@
     <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">
       Entrar
     </v-btn>
-      <FooterVue/>
+    <FooterVue />
   </div>
 
 </template>
@@ -38,13 +40,14 @@ import { LogarUsuario } from "../Services/api"
 
 export default {
   name: 'Login',
-  components:{
+  components: {
     NavBar,
     FooterVue
   },
   data: () => ({
     valid: true,
     alertError: false,
+    alertError1: false,
     alertaSucess: false,
     required: (value) => !!value || "Obrigatório.",
     email: '',
@@ -66,31 +69,31 @@ export default {
   methods: {
     async validate() {
       this.$refs.form.validate()
-       if (this.$refs.form.validate()) {
+      if (this.$refs.form.validate()) {
         const result = await LogarUsuario(this.email, this.senha);
         if (result === 200) {
           this.alertaSucess = true
-    
           setTimeout(() => (this.$router.push('/TelaUser')), 3000)
           // const btn = document.getElementById("btn")
           //btn.innerHTML="Cadastrando..."
-
-
         }
-        else{
+        else if(result === 401) {
           this.alertError = true
           setTimeout(() => (this.alertError = false), 3000)
           this.email = "",
-          this.senha = ""
-
-          
-          } 
-      }
-      else{
-         this.alertError = true
-          setTimeout(() => (this.alertError = false), 3000)
+            this.senha = ""
+        }
+        else{
+           this.alertError1 = true
+          setTimeout(() => (this.alertError1 = false), 3000)
           this.email = "",
-          this.senha = ""
+            this.senha = ""
+        }
+      }
+      else {
+        this.alertError = true
+        setTimeout(() => (this.alertError = false), 3000)
+
 
       }
     },
@@ -102,17 +105,24 @@ export default {
 <style scoped>
 .container {
   display: block;
-  padding-top: 70px;
   max-width: 30%;
   margin: auto;
   padding-bottom: 30px;
 }
 
 .txt {
-  
   text-align: center;
   color: #FCBA03;
   font-weight: bold;
   font-size: 20px;
+
+}
+
+#error {
+  max-width: 18rem;
+  margin: auto;
+  margin-bottom: 30px;
+
+
 }
 </style>

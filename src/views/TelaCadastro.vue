@@ -1,11 +1,14 @@
 <template>
   <div class="txt">
-    <NavBar/>
+    <NavBar />
     <v-alert type="success" v-show="alertaSucess">
       Usuario Cadastrado com Sucesso !
     </v-alert>
-    <v-alert type="error" v-show="alertError" id="alerta">
-      Email Já Cadastrado !
+    <v-alert type="warning" v-show="alertError" id="alerta">
+      Preencha os Campos !
+    </v-alert>
+    <v-alert type="warning" v-show="alertError1" id="alerta">
+      Email já Cadastrado !
     </v-alert>
     <h1>Formulario de Cadastro</h1>
     <div class="container">
@@ -33,7 +36,7 @@
 
     </div>
 
-  <FooterVue/>
+    <FooterVue />
   </div>
 </template>
 
@@ -54,6 +57,7 @@ export default {
   data: () => ({
     valid: true,
     alertError: false,
+    alertError1: false,
     alertaSucess: false,
     dialog: false,
     required: (value) => !!value || "Obrigatório.",
@@ -70,7 +74,7 @@ export default {
     cpf: '',
     cpfRules: [
       v => !!v || 'Insira Um CPF ',
-      v => (v && v.length >= 11) || 'CPF Invalido, Insira o CPF correto',
+      v => (v && v.length >= 13) || 'CPF Invalido, Insira o CPF correto',
     ],
     senha: '',
     letraNum: (v) =>
@@ -85,21 +89,19 @@ export default {
       if (this.$refs.form.validate()) {
         const result = await CriarUsuario(this.name, this.email, this.senha);
         if (result === 200) {
-
           this.alertaSucess = true
           setTimeout(() => (this.$router.push('/')), 3000)
           // const btn = document.getElementById("btn")
           //btn.innerHTML="Cadastrando..."
-
-
         }
-        else this.alertError = true
+        else this.alertError1 = true
       }
       else this.alertError = true;
       //console.log(this.name);
     },
     reset() {
       this.$refs.form.reset()
+      this.alertError1 = false
       this.alertError = false
     },
 

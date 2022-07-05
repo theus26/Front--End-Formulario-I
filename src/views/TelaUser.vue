@@ -39,6 +39,6 @@ export default {
    padding-bottom: 100px;
 }
 #btn{
-   margin-left: 90rem;
+   margin-left: 80rem;
 }
 </style>
